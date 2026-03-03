@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Certificate Portal</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --secondary: #64748b;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
+            color: var(--text-main);
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .main-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: var(--shadow-lg);
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .header {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border);
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+
+        .form-section {
+            padding: 40px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-main);
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.2s;
+            background: #fff;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid var(--border);
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .qr-section {
+            display: none;
+            margin-top: 40px;
+            padding: 40px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        #qrcode-wrapper {
+            display: inline-block;
+            padding: 24px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 12px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Scanned View Styles (Minimalist View) */
+        .scanned-view {
+            display: none;
+            background: white;
+            min-height: 100vh;
+            color: black;
+        }
+
+        .scanned-view h1 {
+            font-size: 21px;
+            margin-bottom: 6px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: normal;
+        }
+
+        body.is-scanned {
+            background: white !important;
+        }
+
+        .no-print {
+            display: block;
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+
+            body {
+                background: white;
+            }
+
+            .scanned-view {
+                padding: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app">
+        <!-- Main Form Container -->
+        <div class="container" id="mainContainer">
+            <div class="main-card">
+                <div class="header">
+                    <h1>🎓 Certificate Generator</h1>
+                    <p>Create and verify achievement certificates instantly</p>
+                </div>
+
+                <div class="form-section" id="formSection">
+                    <form id="certificateForm">
+                        <div class="form-group">
+                            <label for="certId">Certificate ID</label>
+                            <input type="text" id="certId" name="certId" required placeholder="FSP/2026/3/10258101">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="candidate">Candidate Name</label>
+                            <input type="text" id="candidate" name="candidate" required placeholder="Krishna swami KK">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="assessment">Assessment Name</label>
+                            <input type="text" id="assessment" name="assessment" required
+                                placeholder="Digital Engineering">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="email">Candidate Email</label>
+                            <input type="email" id="email" name="email" required placeholder="candidate@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dateIssue">Date of Issue</label>
+                            <input type="text" id="dateIssue" name="dateIssue" required placeholder="02/03/2026">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="percentage">Percentage Marks Overall</label>
+                            <input type="text" id="percentage" name="percentage" required placeholder="73.00">
+                        </div>
+
+                        <button type="submit" class="btn">Generate QR & Certificate</button>
+                    </form>
+
+                    <!-- QR Code Result Section -->
+                    <div class="qr-section" id="qrSection">
+                        <h3 style="margin-bottom: 20px;">Certificate QR Code</h3>
+                        <div id="qrcode-wrapper">
+                            <div id="qrcode"></div>
+                        </div>
+                        <div class="qr-actions">
+                            <button type="button" class="btn btn-secondary" onclick="downloadQR()">📥 Download
+                                QR</button>
+                            <button type="button" class="btn" onclick="viewCertificate()">👁️ View Certificate</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Minimalist Result View (Used for both Preview and QR Scans) -->
+        <div class="scanned-view" id="scannedView">
+            <h1 id="resCertId">Certificate ID : </h1>
+            <h1 id="resCandidate">Candidate : </h1>
+            <h1 id="resAssessment">Assessment Name : </h1>
+            <h1 id="resEmail">Candidate Email: </h1>
+            <h1 id="resDate">Date of Issue : </h1>
+            <h1 id="resPercentage">Percentage Marks Overall: </h1>
+        </div>
+    </div>
+
+    <script>
+        let certificateData = {};
+
+        // Generate QR and save data
+        document.getElementById('certificateForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            certificateData = {
+                certId: document.getElementById('certId').value,
+                candidate: document.getElementById('candidate').value,
+                assessment: document.getElementById('assessment').value,
+                email: document.getElementById('email').value,
+                dateIssue: document.getElementById('dateIssue').value,
+                percentage: document.getElementById('percentage').value
+            };
+
+            // Create verification URL (Handles local files too)
+            const baseUrl = window.location.href.split('?')[0];
+            const params = new URLSearchParams(certificateData);
+            const verifyUrl = baseUrl + '?' + params.toString();
+
+            // Clear and regenerate QR
+            document.getElementById('qrcode').innerHTML = '';
+            new QRCode(document.getElementById('qrcode'), {
+                text: verifyUrl,
+                width: 200,
+                height: 200,
+                colorDark: '#1e293b',
+                colorLight: '#ffffff',
+                correctLevel: QRCode.CorrectLevel.H
+            });
+
+            document.getElementById('qrSection').style.display = 'block';
+            document.getElementById('qrSection').scrollIntoView({ behavior: 'smooth' });
+        });
+
+        // Unified display function
+        function showMinimalistView(data) {
+            document.getElementById('resCertId').innerHTML = `Certificate ID : <span>${data.certId}</span>`;
+            document.getElementById('resCandidate').innerHTML = `Candidate : <span>${data.candidate}</span>`;
+            document.getElementById('resAssessment').innerHTML = `Assessment Name : <span>${data.assessment}</span>`;
+            document.getElementById('resEmail').innerHTML = `Candidate Email: <span>${data.email}</span>`;
+            document.getElementById('resDate').innerHTML = `Date of Issue : <span>${data.dateIssue}</span>`;
+
+            let pct = data.percentage;
+            if (pct && !pct.includes('%')) pct += '%';
+            document.getElementById('resPercentage').innerHTML = `Percentage Marks Overall: <span>${pct}</span>`;
+
+            document.getElementById('mainContainer').style.display = 'none';
+            document.body.classList.add('is-scanned');
+            document.getElementById('scannedView').style.display = 'block';
+        }
+
+        function viewCertificate() {
+            showMinimalistView(certificateData);
+        }
+
+        function closePreview() {
+            document.getElementById('mainContainer').style.display = 'block';
+            document.body.classList.remove('is-scanned');
+            document.getElementById('scannedView').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function downloadQR() {
+            const qrCanvas = document.querySelector('#qrcode canvas');
+            if (qrCanvas) {
+                const link = document.createElement('a');
+                link.download = `QR_${certificateData.certId.replace(/\//g, '_')}.png`;
+                link.href = qrCanvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Process URL parameters for QR scan results
+        window.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('certId')) {
+                const data = {
+                    certId: urlParams.get('certId'),
+                    candidate: urlParams.get('candidate'),
+                    assessment: urlParams.get('assessment'),
+                    email: urlParams.get('email'),
+                    dateIssue: urlParams.get('dateIssue'),
+                    percentage: urlParams.get('percentage')
+                };
+                showMinimalistView(data);
+                // Hide buttons in real scan mode
+                document.querySelector('.no-print').style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>
